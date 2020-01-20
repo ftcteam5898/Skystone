@@ -23,11 +23,23 @@ import java.util.ArrayList;
 @Autonomous(name = "BlueBothSkystonesPlusPark", group = "Autonomous")
 public class BlueBothSkystonesPlusPark extends LinearOpMode {
 
-    private DcMotor lb, lf, rb, rf, liftl, liftr, intakel, intaker;
+    private DcMotor DT3, DT2, DT4, DT1, LF1, LF2, IN1, IN2;
+	//DT2---O----O----DT1
+	// |   IN1  IN2    |
+	// |               |
+	// |               |
+	// |  LF1    LF2   |
+	//DT3-------------DT4
 
-    private CRServo foundation1, foundation2;
+    private CRServo SS1, SS2;
+    private ColorSensor CS1, CS2; //CS1 = V3.0, CS2 = V2.0
+	// -----O----O------
+	// |               |
+	// |               |
+	//CS1             CS2
+	//SS1             SS2
+	// -----------------
 
-    private ColorSensor cs1, cs2;
 
     private BNO055IMU imu2;
     private Orientation angles1, angles2;
@@ -37,17 +49,17 @@ public class BlueBothSkystonesPlusPark extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        lb = hardwareMap.get(DcMotor.class, "lb");
-        lf = hardwareMap.get(DcMotor.class, "lf");
-        rb = hardwareMap.get(DcMotor.class, "rb");
-        rf = hardwareMap.get(DcMotor.class, "rf");
-        liftl = hardwareMap.get(DcMotor.class, "liftl");
-        liftr = hardwareMap.get(DcMotor.class, "liftr");
-        intakel = hardwareMap.get(DcMotor.class, "intakel");
-        intaker = hardwareMap.get(DcMotor.class, "intaker");
-        foundation1 = hardwareMap.get(CRServo.class, "foundation2");
-        cs1 = hardwareMap.get(ColorSensor.class, "cs1");
-        cs2 = hardwareMap.get(ColorSensor.class, "cs2");
+        DT3 = hardwareMap.get(DcMotor.class, "lb");
+        DT2 = hardwareMap.get(DcMotor.class, "lf");
+        DT4 = hardwareMap.get(DcMotor.class, "rb");
+        DT1 = hardwareMap.get(DcMotor.class, "rf");
+        LF1 = hardwareMap.get(DcMotor.class, "liftl");
+        LF2 = hardwareMap.get(DcMotor.class, "liftr");
+        IN1 = hardwareMap.get(DcMotor.class, "intakel");
+        IN2 = hardwareMap.get(DcMotor.class, "intaker");
+        SS1 = hardwareMap.get(CRServo.class, "foundation2");
+        CS1 = hardwareMap.get(ColorSensor.class, "cs1");
+        CS2 = hardwareMap.get(ColorSensor.class, "cs2");
 
         BNO055IMU.Parameters parameters2 = new BNO055IMU.Parameters();
         parameters2.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
@@ -59,93 +71,87 @@ public class BlueBothSkystonesPlusPark extends LinearOpMode {
         imu2.initialize(parameters2);
 
         blackbox = new ArrayList<>();
-
         double headingO = getHeading();
-
-        int amt = 5400;
-
+        int[] pos = {0, 0}; //y = 5400
         waitForStart();
-
-        //align(42.5);
-
         long to = -1;
-        boolean dds = false;
 
-        left(2060, 0.5);
+//Go To Stones
+		left(2060, 0.7);
+		pos[0] = -2060
         correct(headingO);
-        if ((cs2.red() * cs2.green()) / (Math.pow(cs2.blue(), 2)) <= 2) {
-            left(300);
-            forward(150);
-            foundation1.setPower(1);
-            to = System.currentTimeMillis();
-            while (opModeIsActive() && System.currentTimeMillis() - to < 1250) {}
-            forward(100);
-            dds = true;
-        } else {
-            forward(-500);
-            correct(headingO);
-            if ((cs2.red() * cs2.green()) / (Math.pow(cs2.blue(), 2)) <= 2) {
-                left(300);
-                forward(150);
-                foundation1.setPower(1);
-                to = System.currentTimeMillis();
-                while (opModeIsActive() && System.currentTimeMillis() - to < 1250) {}
-                forward(200);
-                amt += 500;
-            } else {
-                forward(-500);
-                left(300);
-                forward(150);
-                correct(headingO);
-                foundation1.setPower(1);
-                to = System.currentTimeMillis();
-                while (opModeIsActive() && System.currentTimeMillis() - to < 1250) {}
-                forward(200);
-                amt += 500;
-            }
-        }
-        left(-900);
+//Scan
+		for (int i = 0; i < 3; i++){
+			if ((CS2.red() * CS2.green()) / (Math.pow(CS2.blue(), 2)) <= 2 || i == 2) {
+				forwardLeft(212);
+				pos[0] -= 150;
+				pos[1] += 150;
+				left(88);
+				pos[0] -= 88;
+				SS1.setPower(1);
+				//to = System.currentTimeMillis();
+				//while (opModeIsActive() && System.currentTimeMillis() - to < 1250) {}
+				forward(100);
+				pos[1] += 100;
+				correct(headingO);
+				break;
+			}
+			else {
+				forward(-500);
+				pos[1] -= 500;
+				correct(headingO);
+			}
+//First Skystone Run (2298, First Stone Y)
+		firstStone = pos[1];
+		forwardRight(1626);
+		pos[0] += 1150;
+		pos[1] += 1150;
         correct(headingO);
-        if (dds) forward(100);
-        forward(amt - 2300);
+        forward(1150 - pos[1]);
+		pos[1] = 2300;
+        SS1.setPower(-1);
+        //to = System.currentTimeMillis();
+        //while (opModeIsActive() && System.currentTimeMillis() - to < 1200) {}
+        SS1.setPower(0);
         correct(headingO);
-        foundation1.setPower(-1);
-        to = System.currentTimeMillis();
-        while (opModeIsActive() && System.currentTimeMillis() - to < 1200) {}
-        foundation1.setPower(0);
+//Return for Second Skystone (1148, 2300)
+        forward(-2300 + (firstStone - 850));
+		pos[1] = firstStone - 850;
+		correct(headingO);
+		forwardRight(-1626);
+		pos[0] -= 1150;
+		pos[1] -= 1150;
+        SS1.setPower(1);
+        //to = System.currentTimeMillis();
+        //while (opModeIsActive() && System.currentTimeMillis() - to < 1250) {}
         correct(headingO);
-        forward(-amt + 300);
+//Second Skystone Run (2298, First Stone y - 2000)
+        forwardRight(1626);
+		pos[0] += 1150
+		pos[1] += 1150
         correct(headingO);
-        left(900, 0.5);
+        forward(850 - firstStone + 2300);
+		pos[1] = 2300
+        SS1.setPower(-1);
+        //to = System.currentTimeMillis();
+        //while (opModeIsActive() && System.currentTimeMillis() - to < 1250) {}
+        SS1.setPower(0);
         correct(headingO);
-        foundation1.setPower(1);
-        to = System.currentTimeMillis();
-        while (opModeIsActive() && System.currentTimeMillis() - to < 1250) {}
-        forward(200);
-        left(-1150);
-        correct(headingO);
-        forward(amt); //
-        foundation1.setPower(-1);
-        to = System.currentTimeMillis();
-        while (opModeIsActive() && System.currentTimeMillis() - to < 1250) {}
-        foundation1.setPower(0);
-        correct(headingO);
-        forward(-2100); //
+//Park
+        forward(-1000);
+		pos[1] -= 1000;
     }
 
+//HEADING
     public void correct(double ho) {
-
         double diff = ho - getHeading();
         spin((int) (-diff * 19));
-
     }
 
     public double getHeading() {
-
         angles2 = imu2.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         double v2 = formatAngle(angles2.angleUnit, angles2.firstAngle);
         return (AngleUnit.DEGREES.normalize(v2)); //[-180, 180]
-
     }
 
     public double formatAngle(AngleUnit angleUnit, double angle) {
@@ -157,89 +163,100 @@ public class BlueBothSkystonesPlusPark extends LinearOpMode {
     }
 
     public void stopRobot() {
-
-        rf.setPower(0);
-        rb.setPower(0);
-        lf.setPower(0);
-        lb.setPower(0);
-
+        DT1.setPower(0);
+        DT4.setPower(0);
+        DT2.setPower(0);
+        DT3.setPower(0);
     }
 
     public void setRunMode(DcMotor.RunMode runMode) {
-
-        lb.setMode(runMode);
-        lf.setMode(runMode);
-        rb.setMode(runMode);
-        rf.setMode(runMode);
-
+        DT3.setMode(runMode);
+        DT2.setMode(runMode);
+        DT4.setMode(runMode);
+        DT1.setMode(runMode);
     }
 
+//MOVEMENT
     public void forward(int amt) {
-
-        rf.setTargetPosition(rf.getCurrentPosition() + amt);
-        rb.setTargetPosition(rb.getCurrentPosition() + amt);
-        lf.setTargetPosition(lf.getCurrentPosition() - amt);
-        lb.setTargetPosition(lb.getCurrentPosition() - amt);
+        DT1.setTargetPosition(DT1.getCurrentPosition() + amt);
+        DT4.setTargetPosition(DT4.getCurrentPosition() + amt);
+        DT2.setTargetPosition(DT2.getCurrentPosition() - amt);
+        DT3.setTargetPosition(DT3.getCurrentPosition() - amt);
         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rf.setPower(0.85);
-        rb.setPower(0.85);
-        lf.setPower(0.85);
-        lb.setPower(0.85);
-        while ((rf.isBusy() && rb.isBusy() && lf.isBusy() && lb.isBusy()) && opModeIsActive()) {}
+        DT1.setPower(0.85);
+        DT4.setPower(0.85);
+        DT2.setPower(0.85);
+        DT3.setPower(0.85);
+        while ((DT1.isBusy() && DT4.isBusy() && DT2.isBusy() && DT#.isBusy()) && opModeIsActive()) {}
         stopRobot();
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
     }
 
     public void left(int amt) {
-
-        rf.setTargetPosition(rf.getCurrentPosition() - amt);
-        rb.setTargetPosition(rb.getCurrentPosition() + amt);
-        lf.setTargetPosition(lf.getCurrentPosition() - amt);
-        lb.setTargetPosition(lb.getCurrentPosition() + amt);
+        DT1.setTargetPosition(DT1.getCurrentPosition() - amt);
+        DT4.setTargetPosition(DT4.getCurrentPosition() + amt);
+        DT2.setTargetPosition(DT2.getCurrentPosition() - amt);
+        DT3.setTargetPosition(DT3.getCurrentPosition() + amt);
         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rf.setPower(0.85);
-        rb.setPower(0.85);
-        lf.setPower(0.85);
-        lb.setPower(0.85);
-        while ((rf.isBusy() && rb.isBusy() && lf.isBusy() && lb.isBusy()) && opModeIsActive()) {}
+        DT1.setPower(0.85);
+        DT4.setPower(0.85);
+        DT2.setPower(0.85);
+        DT3.setPower(0.85);
+        while ((DT1.isBusy() && DT4.isBusy() && DT2.isBusy() && DT3.isBusy()) && opModeIsActive()) {}
         stopRobot();
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
     }
 
     public void left(int amt, double pow) {
-
-        rf.setTargetPosition(rf.getCurrentPosition() - amt);
-        rb.setTargetPosition(rb.getCurrentPosition() + amt);
-        lf.setTargetPosition(lf.getCurrentPosition() - amt);
-        lb.setTargetPosition(lb.getCurrentPosition() + amt);
+        DT1.setTargetPosition(DT1.getCurrentPosition() - amt);
+        DT4.setTargetPosition(DT4.getCurrentPosition() + amt);
+        DT2.setTargetPosition(DT2.getCurrentPosition() - amt);
+        DT3.setTargetPosition(DT3.getCurrentPosition() + amt);
         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rf.setPower(pow);
-        rb.setPower(pow);
-        lf.setPower(pow);
-        lb.setPower(pow);
-        while ((rf.isBusy() && rb.isBusy() && lf.isBusy() && lb.isBusy()) && opModeIsActive()) {}
+        DT1.setPower(pow);
+        DT4.setPower(pow);
+        DT2.setPower(pow);
+        DT3.setPower(pow);
+        while ((DT1.isBusy() && DT4.isBusy() && DT2.isBusy() && DT3.isBusy()) && opModeIsActive()) {}
         stopRobot();
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 
+    public void forwardLeft(int amt) {
+        DT1.setTargetPosition(DT1.getCurrentPosition() + amt);
+        DT3.setTargetPosition(DT3.getCurrentPosition() - amt);
+        setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+        DT1.setPower(1.0);
+        DT3.setPower(1.0);
+        while ((DT1.isBusy() && DT3.isBusy()) && opModeIsActive()) {}
+        stopRobot();
+        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void forwardRight(int amt) {
+        DT4.setTargetPosition(DT4.getCurrentPosition() + amt);
+        DT2.setTargetPosition(DT2.getCurrentPosition() - amt);
+        setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
+        DT4.setPower(1.0);
+        DT2.setPower(1.0);
+        while ((DT4.isBusy() && DT2.isBusy() && opModeIsActive()) {}
+        stopRobot();
+        setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void spin(int amt) {
-
-        rf.setTargetPosition(rf.getCurrentPosition() + amt);
-        rb.setTargetPosition(rb.getCurrentPosition() + amt);
-        lf.setTargetPosition(lf.getCurrentPosition() + amt);
-        lb.setTargetPosition(lb.getCurrentPosition() + amt);
+        DT1.setTargetPosition(DT1.getCurrentPosition() + amt);
+        DT4.setTargetPosition(DT4.getCurrentPosition() + amt);
+        DT2.setTargetPosition(DT2.getCurrentPosition() + amt);
+        DT3.setTargetPosition(DT3.getCurrentPosition() + amt);
         setRunMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rf.setPower(0.85);
-        rb.setPower(0.85);
-        lf.setPower(0.85);
-        lb.setPower(0.85);
-        while ((rf.isBusy() && rb.isBusy() && lf.isBusy() && lb.isBusy()) && opModeIsActive()) {}
+        DT1.setPower(0.85);
+        DT4.setPower(0.85);
+        DT2.setPower(0.85);
+        DT3.setPower(0.85);
+        while ((DT1.isBusy() && DT4.isBusy() && DT2.isBusy() && DT3.isBusy()) && opModeIsActive()) {}
         stopRobot();
         setRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
     }
 
 }

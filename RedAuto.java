@@ -22,9 +22,9 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 import java.util.ArrayList;
 
-@Autonomous(name = "BlueAuto1.0", group = "Autonomous")
+@Autonomous(name = "RedAuto1.0", group = "Autonomous")
 
-public class BlueAuto extends LinearOpMode {
+public class RedAuto extends LinearOpMode {
 
     //Motors (Based on Quadrant)
     private DcMotor DT3, DT2, DT4, DT1, lift, IN1, IN2;
@@ -49,8 +49,11 @@ public class BlueAuto extends LinearOpMode {
         setupHardware();
         setStopMode(DcMotor.ZeroPowerBehavior.BRAKE);
         headingO = getHeading();
+        headingO += 180;
         while (!isStarted()) {
+            position = detector.position;
             telemetry.addData("Current Status:", "OpenCV Live");
+            telemetry.addData("Position: ", position);
             telemetry.update();
         }
 
@@ -105,11 +108,13 @@ public class BlueAuto extends LinearOpMode {
 
     }
 
-    public void leftPosition() {
+    public void rightPosition() {
 
         telemetry.addData("Heading:", getHeading());
         telemetry.update();
-        left(400, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        left(200, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        forward(300, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        left(200, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO - 90);
         forward(-1000, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
@@ -121,7 +126,7 @@ public class BlueAuto extends LinearOpMode {
         ctr.setPosition(0.57);
         waitMillis(500);
         forward(500, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        spin(730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO);
         forward(-2000, 0.1, 0.9, 1, 0.3, 0.333, 0.333);
         telemetry.addData("Heading: ", getHeading());
@@ -131,7 +136,7 @@ public class BlueAuto extends LinearOpMode {
         cbr.setPosition(0.32);
         ctr.setPosition(0.32);
         forward(2775, 0.4, 0.6, 1, 0.3, 0.333, 0.333);
-        spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO - 90);
         forward(-500, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         telemetry.addData("Heading: ", getHeading());
@@ -142,7 +147,7 @@ public class BlueAuto extends LinearOpMode {
         ctr.setPosition(0.57);
         waitMillis(500);
         forward(400, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        spin(730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO);
         forward(-2900, 0.1, 0.9, 1, 0.3, 0.333, 0.333);
         telemetry.addData("Heading: ", getHeading());
@@ -157,7 +162,7 @@ public class BlueAuto extends LinearOpMode {
     public void middlePosition() {
 
         left(400, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        forward(200, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        forward(100, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO - 90);
         forward(-1000, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
@@ -167,7 +172,7 @@ public class BlueAuto extends LinearOpMode {
         ctr.setPosition(0.57);
         waitMillis(500);
         forward(500, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        spin(730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO);
         forward(-2200, 0.1, 0.9, 1, 0.3, 0.333, 0.333);
         ctl.setPosition(0.77);
@@ -175,7 +180,7 @@ public class BlueAuto extends LinearOpMode {
         cbr.setPosition(0.32);
         ctr.setPosition(0.32);
         forward(2925, 0.4, 0.6, 1, 0.3, 0.333, 0.333);
-        spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO - 90);
         forward(-500, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         ctl.setPosition(0.52);
@@ -184,7 +189,7 @@ public class BlueAuto extends LinearOpMode {
         ctr.setPosition(0.57);
         waitMillis(500);
         forward(400, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        spin(730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO);
         forward(-3100, 0.1, 0.9, 1, 0.3, 0.333, 0.333);
         ctl.setPosition(0.77);
@@ -194,10 +199,10 @@ public class BlueAuto extends LinearOpMode {
 
     }
 
-    public void rightPosition() {
+    public void leftPosition() {
 
         left(400, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        forward(400, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        forward(-100, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         forward(-1000, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         ctl.setPosition(0.52);
@@ -206,7 +211,7 @@ public class BlueAuto extends LinearOpMode {
         ctr.setPosition(0.57);
         waitMillis(500);
         forward(500, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        spin(730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO);
         forward(-2330, 0.1, 0.9, 1, 0.3, 0.333, 0.333);
         ctl.setPosition(0.9);
@@ -214,9 +219,9 @@ public class BlueAuto extends LinearOpMode {
         cbr.setPosition(0.19);
         ctr.setPosition(0.19);
         forward(2500, 0.4, 0.6, 1, 0.3, 0.333, 0.333);
-        spin(-730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        left(300, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        spin(-60, 0.2, 0.5, 0.5, 0.5, 0.333, 0.333);
+        spin(730, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        left(-400, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(60, 0.2, 0.5, 0.5, 0.5, 0.333, 0.333);
         forward(-600, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         ctl.setPosition(0.52);
         cbl.setPosition(0.52);
@@ -224,8 +229,8 @@ public class BlueAuto extends LinearOpMode {
         ctr.setPosition(0.57);
         waitMillis(500);
         forward(500, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        left(-300, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
-        spin(790, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        left(400, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
+        spin(-790, 0.2, 0.5, 0.7, 0.3, 0.333, 0.333);
         correct(headingO);
         forward(-2600, 0.1, 0.9, 1, 0.3, 0.333, 0.333);
         ctl.setPosition(0.77);
